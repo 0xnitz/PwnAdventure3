@@ -16,7 +16,7 @@ class Packet:
             return f'({round(x,2)}, {round(y,2)}, {round(z,2)})'
         elif type == b'jp':
             if payload[0]:
-                return f'Jump -> ' + Packet(payload[1:], self.associatedPort).parse_packet()
+                return f'Jump git -> ' + Packet(payload[1:], self.associatedPort).parse_packet()
             return f'EJmp -> ' + Packet(payload[1:], self.associatedPort).parse_packet()
 
         raise ParsingException()
