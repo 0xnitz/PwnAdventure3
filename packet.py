@@ -1,18 +1,31 @@
 from struct import unpack
 
+class ParsingException(Exception):
+    def __init__(self):
+        super().__init__(self)
 
 class Packet:
-    def __init__(self, payload):
+    def __init__(self, payload, sport):
         self.payload = payload[2:]
         self.type = payload[:2]
+        self.associatedPort = sport
+
+    def parse_content(self, type, payload):
+        if type == b'mv':
+            x, z, y = unpack('fff', payload[:12])
+            return f'({round(x,2)}, {round(y,2)}, {round(z,2)})'
+        elif type == b'jp':
+            if payload[0]:
+                return f'Jump -> ' + Packet(payload[1:], self.associatedPort).parse_packet()
+            return f'EJmp -> ' + Packet(payload[1:], self.associatedPort).parse_packet()
+
+        raise ParsingException()
+
 
     def parse_packet(self):
-        if self.type == b'mv':
-            x, z, y = unpack('fff', self.payload[:12])
-            return f'({round(x,2)},{round(y,2)},{round(z,2)})'
-        elif self.type == b'jp':
-            if self.payload[0]:
-                return f'Jump -> ' + Packet(self.payload[1:]).parse_packet()
-            return f'EJmp -> ' + Packet(self.payload[1:]).parse_packet()
+        try:
+            return f'FROM {self.associatedPort} --> ' + self.parse_content(self.type, self.payload)
+        except ParsingException:
+            return 'Parse error'
 
-        return ''
+    
