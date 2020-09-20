@@ -1,48 +1,13 @@
 import threading
 import socket
 
-class asyncSocketClient:
-    BUFFER_SIZE = 1024
-
-    def __init__(self, clientIp, clientPort, mainpulationFunc):
-        self.clientIp   = clientIp
-        self.clientPort = clientPort
-        self.sock       = None
-
-    def initialize(self):
-        self.sock = socket.socket()
-        self.sock.connect((self.clientIp, self.clientPort))
-
-    def send(self, data):
-        data = self.mainpulationFunc(data)
-        self.send(data)
-
-class asyncSocketServer:
-    BUFFER_SIZE = 1024
-
-    def __init__(self, serverPort, mainpulationFunc):
-        self.clientIp = clientIp
-        self.serverIp = serverIp
-        self.isServer = isServer
-        self.sock     = None
-
-    def start(self):
-        self.sock = socket.socket()
-
-        if not isServer:
-            self.sock.connect((self.serverIp, self.serverPort))
-        else:
-            self.sock.listen(1)
-            self.sock.bind(('', serverPort))
-
 def handler_doNothing(txt):
         return txt
 
 class proxy:
-    def __init__(self, serverIp, serverPort, clientIp, clientPort, clientManipulation=handler_doNothing, serverManipulation=handler_doNothing):
+    def __init__(self, serverIp, serverPort, clientPort, clientManipulation=handler_doNothing, serverManipulation=handler_doNothing):
         self.serverIp           = serverIp
         self.serverPort         = serverPort
-        self.clientIp           = clientIp
         self.clientPort         = clientPort
         self.threads            = []
         self.clientManipulation = clientManipulation
@@ -80,5 +45,16 @@ class proxy:
 
         tServer.start()
         tClient.start()
+
+        for x in self.threads:
+            x.join()
+
+    def stop(self):
+        for x in self.threads:
+            x.stop()
+        
+        self.listenSock.close()
+        self.clientSock.close()
+        self.serverSock.close()
 
         
