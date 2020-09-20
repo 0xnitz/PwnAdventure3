@@ -17,13 +17,13 @@ class proxy:
         self.listenSock = socket.socket()
 
     def initialize(self):
-        print 'Waiting for client'
+        print('Waiting for client')
         self.listenSock.bind(('', self.clientPort))
         self.listenSock.listen(1)
         c, addr = self.listenSock.accept()
         self.serverSock = c
 
-        print 'Connecting server'
+        print('Connecting server')
         self.clientSock.connect((self.serverIp, self.serverPort))
 
     def serverRunner(self):
