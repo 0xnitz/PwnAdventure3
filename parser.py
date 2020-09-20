@@ -18,4 +18,5 @@ def show_pack(pack):
         print(e)
 
 
-sniff(prn=show_pack, lfilter=lambda x: x.haslayer(TCP) and (x[TCP].dport == 3000 or x[TCP].sport == 3000))
+sniff(prn=show_pack, lfilter=lambda x: x.haslayer(TCP) and
+                                       ((3000 <= x[TCP].dport <= 3005) or (3000 <= x[TCP].sport <= 3005)))

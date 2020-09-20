@@ -2,6 +2,7 @@ from struct import pack, unpack
 
 
 last_pos = b''
+height = 0
 
 CHAT = b'#*'
 
@@ -28,6 +29,8 @@ SERVER_POSITION = b'ps'
 MANA_REG = b'ma'
 HP_REG = b'++'
 
+RESPAWN = b'rs'
+
 
 class ParsingException(Exception):
     def __init__(self):
@@ -46,10 +49,13 @@ class Packet:
     def exec_cmd(self):
         cmd = self.packet_to_str()[7:]
         packet = b''
-        if cmd[:2] == 'tp':
+        if cmd[:3] == '$tp':
             x, y, z = [float(x) for x in cmd.split()[1:]]
             packet = last_pos
             return packet[:2] + pack('fff', x, z, y) + packet[14:]
+        #elif cmd[:5] == 'hover':
+        #    global height
+        #    height = [float(x) for x in cmd.split()[1:]]
 
         return packet
 
@@ -107,6 +113,8 @@ class Packet:
         elif self.type == AREA_CHANGE:
             area_length = unpack('H', self.payload[2:4])[0]
             return f'<- [Area] {self.payload[4:4+area_length].decode()}'
+        elif self.type == RESPAWN:
+            return f'[RESPAWN]'
         elif self.type == CHAT:
             if self.sport != 3000:
                 message_length = unpack('H', self.payload[2:4])[0]
